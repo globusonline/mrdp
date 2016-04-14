@@ -335,6 +335,7 @@ def graph():
                                     Authorization='Bearer ' + source_token,
                                 ),
                                 allow_redirects=False)
+        response.raise_for_status()
         svgs.update(render_graphs(
             csv_data=response.iter_lines(decode_unicode=True),
             append_titles=" from %s for %s" % (dataset['name'], selected_year),
@@ -367,7 +368,7 @@ def graph():
                      headers=dict(
                         Authorization='Bearer ' + dest_token,
                      ),
-                     allow_redirects=False)
+                     allow_redirects=False).raise_for_status()
 
     flash("%d-file SVG upload to %s on %s completed!" %
           (len(svgs), dest_path, dest_info['display_name']))
