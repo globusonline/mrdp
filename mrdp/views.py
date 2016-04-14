@@ -360,8 +360,8 @@ def graph():
             raise
 
     for filename, svg in svgs.items():
-        # TODO Does the HTTPS server throw an error for an already-existing
-        # destination file, or is it silently overwritten?
+        # n.b. The HTTPS Server will overwrite existing files that you PUT.
+
         requests.put('%s%s%s.svg' % (dest_https, dest_path, filename),
                      data=svg,
                      verify=False,  # FIXME
