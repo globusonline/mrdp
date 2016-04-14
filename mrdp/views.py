@@ -330,7 +330,6 @@ def graph():
         source_path = dataset['path']
         response = requests.get('%s%s%s/%s.csv' % (source_https, source_base,
                                                    source_path, selected_year),
-                                verify=False,  # FIXME
                                 headers=dict(
                                     Authorization='Bearer ' + source_token,
                                 ),
@@ -364,7 +363,6 @@ def graph():
 
         requests.put('%s%s%s.svg' % (dest_https, dest_path, filename),
                      data=svg,
-                     verify=False,  # FIXME
                      headers=dict(
                         Authorization='Bearer ' + dest_token,
                      ),
