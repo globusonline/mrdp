@@ -8,7 +8,7 @@ try:
 except:
     from urlparse import urlparse, urljoin
 
-from mrdp import app
+from portal import app
 
 
 def basic_auth_header():

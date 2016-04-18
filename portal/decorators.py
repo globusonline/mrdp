@@ -2,7 +2,7 @@ from flask import g, redirect, request, session, url_for
 from functools import wraps
 from oauth2client import client as oauth
 
-from mrdp import database
+from portal import database
 
 
 def authenticated(fn):

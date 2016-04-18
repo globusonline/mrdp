@@ -12,10 +12,11 @@ except:
 
 from globus_sdk import TransferClient, TransferAPIError
 
-from mrdp import app, database, datasets
-from mrdp.decorators import authenticated
-from mrdp.processing import render_graphs
-from mrdp.utils import basic_auth_header, get_safe_redirect, get_portal_tokens
+from portal import app, database, datasets
+from portal.decorators import authenticated
+from portal.processing import render_graphs
+from portal.utils import (basic_auth_header, get_safe_redirect,
+                          get_portal_tokens)
 
 
 @app.route('/', methods=['GET'])
