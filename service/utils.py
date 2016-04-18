@@ -34,10 +34,10 @@ def token_introspect(token):
     #     "exp": 1419356238,
     #     "iat": 1419350238,
     #     "nbf": 1419350238,
-    #     “identities_set”: [“2982f207-04c0-11e5-ac60-22000b92c6ec”,
-    #     ”3982f207-04c0-11e5-ac60-22000b92c6ed”]
-    #     “name”: “Joe User”,
-    #     “email”: “user1@example.dom”
+    #     "identities_set": ["2982f207-04c0-11e5-ac60-22000b92c6ec",
+    #                        "3982f207-04c0-11e5-ac60-22000b92c6ed"]
+    #     "name": "Joe User",
+    #     "email": "user1@example.dom"
     # }
 
     return token_data.json()
