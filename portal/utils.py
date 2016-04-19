@@ -1,4 +1,3 @@
-from base64 import urlsafe_b64encode
 from flask import request
 from httplib2 import Http
 from oauth2client import client as oauth
@@ -10,18 +9,6 @@ except:
     from urlparse import urlparse, urljoin
 
 from portal import app
-
-
-def basic_auth_header():
-    """Generate a Globus Auth compatible basic auth header."""
-    auth_config = app.config['GLOBUS_AUTH']
-    cid = auth_config['client_id']
-    csecret = auth_config['client_secret']
-
-    creds = '{}:{}'.format(cid, csecret)
-    basic_auth = urlsafe_b64encode(creds.encode(encoding='UTF-8'))
-
-    return 'Basic ' + basic_auth.decode(encoding='UTF-8')
 
 
 def is_safe_redirect_url(target):

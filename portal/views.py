@@ -15,7 +15,7 @@ from globus_sdk import (TransferClient, TransferAPIError,
 
 from portal import app, database, datasets
 from portal.decorators import authenticated
-from portal.utils import basic_auth_header, get_safe_redirect
+from portal.utils import get_safe_redirect
 
 
 @app.route('/', methods=['GET'])
@@ -46,17 +46,19 @@ def logout():
     - Destroy the session.
     - Redirect the user to the Globus Auth logout page.
     """
-    auth_config = app.config['GLOBUS_AUTH']
 
-    headers = {'Authorization': basic_auth_header()}
+    from json import load
+    auth_config = load(open('portal/auth.json'))['web']
+
+    from base64 import urlsafe_b64encode
+    creds = '%s:%s' % (auth_config['client_id'],
+                       auth_config['client_secret'])
+    basic_auth = urlsafe_b64encode(creds.encode(encoding='UTF-8'))
+    headers = {'Authorization': 'Basic ' + basic_auth.decode(encoding='UTF-8')}
     data = {
         'token_type_hint': 'refresh',
         'token': g.credentials.refresh_token
     }
-
-    # If we don't get support for POST body client credentials,
-    # add a commented out example of using the oauth2client revoke
-    # method.
 
     # Invalidate the tokens with Globus Auth
     requests.post(auth_config['revoke_uri'],
