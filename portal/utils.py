@@ -65,7 +65,7 @@ def get_portal_tokens():
         if not get_portal_tokens.access_tokens:
             get_portal_tokens.access_tokens = {}
 
-            for service in ['https', 'transfer']:
+            for service in ['https', 'transfer', 'service']:
                 refresh_token = app.config['PORTAL_REFRESH_TOKEN_' +
                                            service.upper()]
                 get_portal_tokens.access_tokens[service] = requests.post(
