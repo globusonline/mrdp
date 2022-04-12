@@ -40,7 +40,7 @@ def get_safe_redirect():
 
 
 def get_portal_tokens(
-        scopes=['openid', 'urn:globus:auth:scope:demo-resource-server:all']):
+        scopes=['openid', 'urn:globus:auth:scope:demo-resource-server:all', 'urn:globus:auth:scope:demo-resource-server:all[https://auth.globus.org/scopes/' + app.config['GRAPH_ENDPOINT_ID'] + '/https]']):
     """
     Uses the client_credentials grant to get access tokens on the
     Portal's "client identity."
