@@ -172,6 +172,11 @@ def authcallback():
             return redirect(url_for('profile',
                             next=url_for('transfer')))
 
+
+        state = request.args.get('state')
+        if state == '_inflight_transfer_consent':
+            return redirect(url_for('retry_transfer'))
+
         return redirect(url_for('transfer'))
 
 
@@ -277,16 +282,8 @@ def transfer():
         return redirect(browse_endpoint)
 
 
-@app.route('/submit-transfer', methods=['POST'])
-@authenticated
-def submit_transfer():
-    """
-    - Take the data returned by the Browse Endpoint helper page
-      and make a Globus transfer request.
-    - Send the user to the transfer status page with the task id
-      from the transfer.
-    """
-    browse_endpoint_form = request.form
+
+def transfer_datasets(params):
 
     selected = session['form']['datasets']
     filtered_datasets = [ds for ds in datasets if ds['id'] in selected]
@@ -301,22 +298,17 @@ def submit_transfer():
 
     transfer = TransferClient(authorizer=authorizer)
 
-    source_endpoint_id = app.config['DATASET_ENDPOINT_ID']
-    source_endpoint_base = app.config['DATASET_ENDPOINT_BASE']
-    destination_endpoint_id = browse_endpoint_form['endpoint_id']
-    destination_folder = browse_endpoint_form.get('folder[0]')
-
     transfer_data = TransferData(transfer_client=transfer,
-                                 source_endpoint=source_endpoint_id,
-                                 destination_endpoint=destination_endpoint_id,
-                                 label=browse_endpoint_form.get('label'))
+                                 source_endpoint=params['source_endpoint_id'],
+                                 destination_endpoint=params['destination_endpoint_id'],
+                                 label=params['label'])
 
     for ds in filtered_datasets:
-        source_path = source_endpoint_base + ds['path']
-        dest_path = browse_endpoint_form['path']
+        source_path = params['source_endpoint_base'] + ds['path']
+        dest_path = params['destination_path']
 
-        if destination_folder:
-            dest_path += destination_folder + '/'
+        if params['destination_path']:
+            dest_path += params['destination_path'] + '/'
 
         dest_path += ds['name'] + '/'
 
@@ -324,13 +316,86 @@ def submit_transfer():
                                destination_path=dest_path,
                                recursive=True)
 
-    transfer.endpoint_autoactivate(source_endpoint_id)
-    transfer.endpoint_autoactivate(destination_endpoint_id)
+    transfer.endpoint_autoactivate(params['source_endpoint_id'])
+    transfer.endpoint_autoactivate(params['destination_endpoint_id'])
     task_id = transfer.submit_transfer(transfer_data)['task_id']
 
     flash('Transfer request submitted successfully. Task ID: ' + task_id)
 
     return(redirect(url_for('transfer_status', task_id=task_id)))
+
+
+@app.route('/submit-transfer', methods=['GET'])
+@authenticated
+def retry_transfer():
+    transfer_data = session['_inflight_transfer']
+    return transfer_datasets(transfer_data)
+
+
+@app.route('/submit-transfer', methods=['POST'])
+@authenticated
+def submit_transfer():
+    """
+    - Take the data returned by the Browse Endpoint helper page
+      and make a Globus transfer request.
+    - Send the user to the transfer status page with the task id
+      from the transfer.
+    """
+    browse_endpoint_form = request.form
+
+    transfer_tokens = session['tokens']['transfer.api.globus.org']
+
+    authorizer = RefreshTokenAuthorizer(
+        transfer_tokens['refresh_token'],
+        load_portal_client(),
+        access_token=transfer_tokens['access_token'],
+        expires_at=transfer_tokens['expires_at_seconds'])
+
+    transfer = TransferClient(authorizer=authorizer)
+
+    transfer_params = {
+        'source_endpoint_id': app.config['DATASET_ENDPOINT_ID'],
+        'source_endpoint_base': app.config['DATASET_ENDPOINT_BASE'],
+        'destination_endpoint_id': browse_endpoint_form['endpoint_id'],
+        'destination_path': browse_endpoint_form['path'],
+        'destination_folder': browse_endpoint_form.get('folder[0]'),
+        'label': browse_endpoint_form.get('label')
+    }
+
+    destination = transfer.get_endpoint(transfer_params['destination_endpoint_id'])
+
+    try:
+      [major, minor, _patch] = destination['gcs_version'].split('.')
+    except:
+        major = 0
+        minor = 0
+
+    is_share = 0
+    is_non_ha_mapped = not destination['high_assurance'] and (
+        int(major) >= 5
+        and int(minor) >= 4
+    ) and not destination['non_functional'] and not is_share
+
+    if is_non_ha_mapped:
+        data_access_scope = "https://auth.globus.org/scopes/" + destination["id"] + "/data_access"
+        has_consented = session.get('_inflight_transfer_consent') and session['tokens'].get(session['_inflight_consent'])
+
+        if not has_consented:
+            session['_inflight_transfer_consent'] = data_access_scope
+            session['_inflight_transfer'] = transfer_params
+            scopes = app.config['USER_SCOPES'] + (data_access_scope, "urn:globus:auth:scope:transfer.api.globus.org:all["+ data_access_scope +"]")
+            redirect_uri = url_for('authcallback', _external=True)
+            client = load_portal_client()
+            client.oauth2_start_flow(
+                redirect_uri,
+                refresh_tokens=True,
+                requested_scopes=scopes,
+                state="_inflight_transfer_consent"
+            )
+            auth_uri = client.oauth2_get_authorize_url()
+            return redirect(auth_uri)
+
+    return transfer_datasets(transfer_params)
 
 
 @app.route('/status/<task_id>', methods=['GET'])
