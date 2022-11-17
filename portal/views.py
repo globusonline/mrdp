@@ -390,7 +390,9 @@ def graph():
     resp = requests.post(service_url, headers=req_headers, data=req_data,
                          verify=False)
 
-    resp.raise_for_status()
+    if not resp.ok:
+        flash("There was an issue processing the dataset, please try another one.")
+        return redirect(url_for('graph'))
 
     resp_data = resp.json()
     dest_ep = resp_data.get('dest_ep')
