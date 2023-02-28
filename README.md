@@ -126,10 +126,10 @@ The Globus Sample Data Portal requires Python 3.9 or newer.
 Deploying and fully configuring Nginx is out of scope of this document. However, if you wish to use Nginx as a reverse proxy, you can use the location block below:
 ```
   location / {
-    proxy_pass https://localhost:5000/;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
     proxy_set_header X-Forwarded-Host $host;
     proxy_set_header X-Forwarded-Prefix /;
+    proxy_pass https://localhost:5000/;
   }
 ```
