@@ -1,10 +1,11 @@
-# Modern Research Data Portal
-Simple web app framework demonstrating how to build a data portal using
-the Globus [platform](https://www.globus.org/platform).
+# Globus Sample Data Portal: A Modern Research Data Portal Implementation
+
+A Python (Flask-based) web application demonstrating how to build a [Modern Research Data Portal](https://docs.globus.org/guides/recipes/modern-research-data-portal/) using
+the [Globus platform](https://www.globus.org/platform).
 
 ## Overview
-This repository contains two separate server applications. The first, the "Portal," is an example "research portal"
-that demonstrates how to authenticate users with Globus [Auth](https://docs.globus.org/api/auth/), how to make requests against the Globus [Transfer API](https://docs.globus.org/api/transfer/), and how to interact with an HTTPS-enabled Globus Endpoint. All of the Portal code can be found in the `portal/` directory.
+This repository contains two separate server applications. The first, the "portal," is an example "research portal"
+that demonstrates how to authenticate users with [Globus Auth](https://docs.globus.org/api/auth/), how to make requests against the [Globus Transfer API](https://docs.globus.org/api/transfer/), and how to interact with an HTTPS-enabled Globus collection. All of the portal code can be found in the `portal/` directory.
 
 The second application, the "Service," is an example "resource server" that demonstrates how a research portal can offload tasks to a separate service that has the capability to perform tasks on behalf of users. All of the Service code can be found in the `service/` directory.
 
@@ -20,9 +21,8 @@ The Globus Sample Data Portal requires Python 3.9 or newer.
 * [Amazon EC2](#amazon-ec2)
 * [Reverse Proxy with Nginx](#reverse-proxy-with-nginx)
 
-#### Create your own App registration for use in the Portal. 
-* Visit the [Globus Developer Pages](https://developers.globus.org) to register an App.
-* If this is your first time visiting the Developer Pages you'll be asked to create a Project. A Project is a way to group Apps together.
+#### Register a Globus Application for use in the Portal. 
+* [Register an Application with Globus](https://docs.globus.org/api/auth/developer-guide/#register-app)
 * When registering the App you'll be asked for some information, including the redirect URL and any scopes you will be requesting.
     * Redirect URL: `https://localhost:5000/authcallback` (note: if using EC2 `localhost` should be replaced with the IP address of your instance).
     * Scopes: `urn:globus:auth:scope:transfer.api.globus.org:all`, `openid`, `profile`, `email`
