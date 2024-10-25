@@ -1,4 +1,4 @@
 Flask==2.2.2
 pygal==3.0.0
 globus-sdk==3.12.0
-werkzeug==2.3.8
+werkzeug==3.0.6
