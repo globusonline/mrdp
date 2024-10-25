@@ -4,7 +4,7 @@ This code base represents a point-in-time implementation of a portal implementin
 
 **It is no longer recommended as a starting point for building a portal,** but is still available as a reference.
 
-See https://github.com/globus/sample-data-portal for our current reccomendations.
+See https://github.com/globus/sample-data-portal for our current recommendations.
 
 ----------------
 
