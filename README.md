@@ -1,3 +1,14 @@
+# ⚠️ DEPRECATION NOTICE ⚠️
+
+This code base represents a point-in-time implementation of a portal implementing the Modern Research Data Portal pattern. 
+
+**It is no longer recommended as a starting point for building a portal,** but is still available as a reference.
+
+See https://github.com/globus/sample-data-portal for our current reccomendations.
+
+----------------
+
+
 # Globus Sample Data Portal: A Modern Research Data Portal Implementation
 
 A Python (Flask-based) web application demonstrating how to build a [Modern Research Data Portal](https://docs.globus.org/guides/recipes/modern-research-data-portal/) using
